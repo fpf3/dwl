@@ -59,6 +59,7 @@
 #include <wlr/types/wlr_xdg_shell.h>
 #include <wlr/util/log.h>
 #include <wlr/util/region.h>
+#include <wlr/util/box.h>
 #include <xkbcommon/xkbcommon.h>
 #ifdef XWAYLAND
 #include <wlr/xwayland.h>
@@ -2010,13 +2011,21 @@ monocle(Monitor *m)
 {
 	Client *c;
 	int n = 0;
+    unsigned int e = m->gaps;
+
+    struct wlr_box monocle_geometry = m->w;
+    monocle_geometry.width -= gappx;
+    monocle_geometry.height -= gappx;
+    monocle_geometry.x += (gappx >> 1);
+    monocle_geometry.y += (gappx >> 1);
 
 	wl_list_for_each(c, &clients, link) {
 		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
 			continue;
-		resize(c, m->w, 0);
+		resize(c, monocle_geometry, 0);
 		n++;
 	}
+
 	if (n)
 		snprintf(m->ltsymbol, LENGTH(m->ltsymbol), "[%d]", n);
 	if ((c = focustop(m)))
@@ -2886,19 +2895,20 @@ tile(Monitor *m)
 	int i, n = 0;
 	Client *c;
 
+    int slave_gap = (m->nmaster <= 0) ? 1 : 0;
+
 	wl_list_for_each(c, &clients, link)
 		if (VISIBLEON(c, m) && !c->isfloating && !c->isfullscreen)
 			n++;
 	if (n == 0)
 		return;
-    if (smartgaps == n)
-        e = 0;
 
 	if (n > m->nmaster)
 		mw = m->nmaster ? (int)roundf(m->w.width + gappx*e) * m->mfact : 0;
 	else
 		mw = m->w.width;
-	i = my = ty = 0;
+	i = 0;
+    my = ty = gappx * e;
 	wl_list_for_each(c, &clients, link) {
 		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
 			continue;
@@ -2911,8 +2921,8 @@ tile(Monitor *m)
 		} else {
 			r = n - i;
 			h = (m->w.height - ty - gappx*e - gappx*e * (r - 1)) / r;
-            resize(c, (struct wlr_box){.x = m->w.x + mw, .y = m->w.y + ty,
-				.width = m->w.width - mw - gappx*e, .height = h}, 0);
+            resize(c, (struct wlr_box){.x = m->w.x + mw + slave_gap*gappx*e, .y = m->w.y + ty,
+				.width = m->w.width - mw - (1 + slave_gap)*gappx*e, .height = h}, 0);
 			ty += c->geom.height + gappx*e;
 		}
 		i++;
