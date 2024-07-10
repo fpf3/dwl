@@ -5,6 +5,11 @@
  * that they will simply compile out if the chosen #defines leave them unused.
  */
 
+#ifndef CLIENT_H
+#define CLIENT_H
+
+#include "types.h"
+
 /* Leave these functions first; they're used in the others */
 static inline int
 client_is_x11(Client *c)
@@ -406,3 +411,5 @@ client_wants_fullscreen(Client *c)
 #endif
 	return c->surface.xdg->toplevel->requested.fullscreen;
 }
+
+#endif /* CLIENT_H */
