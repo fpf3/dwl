@@ -2992,13 +2992,11 @@ setup(void)
 	output_mgr = wlr_output_manager_v1_create(dpy);
 	LISTEN_STATIC(&output_mgr->events.apply, outputmgrapply);
 	LISTEN_STATIC(&output_mgr->events.test, outputmgrtest);
-
-//<<<<<<< HEAD
+    
+    // XXX FPF3 - merging with upstream broke this... why? what is it?
 	//wlr_scene_set_presentation(scene, wlr_presentation_create(dpy, backend));
-	//wl_global_create(dpy, &zdwl_ipc_manager_v2_interface, 2, NULL, dwl_ipc_manager_bind);
+	wl_global_create(dpy, &zdwl_ipc_manager_v2_interface, 2, NULL, dwl_ipc_manager_bind);
 
-//=======
-//>>>>>>> 452a314faa18573fe100a03a154fdd0a0ad54ba2
 	/* Make sure XWayland clients don't connect to the parent X server,
 	 * e.g when running in the x11 backend or the wayland backend and the
 	 * compositor has Xwayland support */
