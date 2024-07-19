@@ -8,8 +8,6 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include "types.h"
-
 /* Leave these functions first; they're used in the others */
 static inline int
 client_is_x11(Client *c)
