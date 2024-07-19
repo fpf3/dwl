@@ -1,4 +1,8 @@
 /* Taken from https://github.com/djpohly/dwl/issues/466 */
+
+#ifndef CONFIG_H
+#define CONFIG_H
+
 #define COLOR(hex)    { ((hex >> 24) & 0xFF) / 255.0f, \
                         ((hex >> 16) & 0xFF) / 255.0f, \
                         ((hex >> 8) & 0xFF) / 255.0f, \
@@ -24,8 +28,10 @@ static int log_level = WLR_ERROR;
 
 /* Autostart */
 static const char *const autostart[] = {
-        "dwl_autostart_blocking.sh", NULL,
+        //"dwl_autostart_blocking.sh", NULL,
         "dwl_autostart.sh", NULL,
+        "statusbar", "-cmdline", "|", "dwlb", "-status-stdin", "all", NULL,
+        "dwlb", "-ipc", "-font", "monospace:size=10", "-hide-vacant-tags", NULL,
         NULL /* terminate */
 };
 
@@ -117,7 +123,7 @@ LIBINPUT_CONFIG_TAP_MAP_LMR -- 1/2/3 finger tap maps to left/middle/right
 */
 static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TAP_MAP_LRM;
 
-/* If you want to use the windows key for MODKEY, use WLR_MODIFIER_LOGO */
+//#define MODKEY WLR_MODIFIER_ALT
 #define MODKEY WLR_MODIFIER_LOGO
 
 #define TAGKEYS(KEY,SKEY,TAG) \
@@ -191,3 +197,5 @@ static const Button buttons[] = {
 	{ MODKEY, BTN_MIDDLE, togglefloating, {0} },
 	{ MODKEY, BTN_RIGHT,  moveresize,     {.ui = CurResize} },
 };
+
+#endif /* CONFIG_H */

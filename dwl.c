@@ -326,7 +326,10 @@ autostartexec(void) {
 			die("dwl: execvp %s:", *p);
 		}
 		/* skip arguments */
-		while (*++p);
+        fprintf(stderr, "%s ", *p);
+		while (*++p)
+            fprintf(stderr, "%s ", *p);
+        fprintf(stderr, "\n");
 	}
 }
 
@@ -513,6 +516,8 @@ cleanup(void)
 			waitpid(autostart_pids[i], NULL, 0);
 		}
 	}
+
+    free(autostart_pids);
 
 	if (child_pid > 0) {
 		kill(-child_pid, SIGTERM);
@@ -1488,13 +1493,13 @@ fullscreen(const Arg *arg)
 {
 	static Layout *last_layout = &((Layout*)layouts)[0];
 	if (selmon->showbar) {
-        selmon->last_sellt = selmon->sellt;
+        for (last_layout = (Layout*)layouts; last_layout != selmon->lt[selmon->sellt]; last_layout++);
+        selmon->last_lt = last_layout;
 		setlayout(&((Arg) { .v = &layouts[2] }));
 	} else {
-        selmon->sellt = selmon->last_sellt;
-		setlayout(&((Arg) { .v = &layouts[selmon->last_sellt]}));
+		setlayout(&((Arg) { .v = selmon->last_lt}));
 	}
-	togglebar(arg);
+	togglebar((const Arg*)NULL);
 }
 
 
@@ -2323,10 +2328,24 @@ setfloating(Client *c, int floating)
 void
 setfullscreen(Client *c, int fullscreen)
 {
+/*
 	c->isfullscreen = fullscreen;
 	if (!c->mon)
 		return;
 	client_set_fullscreen(c, fullscreen);
+*/
+    if (fullscreen && !c->isfullscreen) {
+        c->oldbw = c->bw; // no borders on fullscreen windows.
+        c->bw = 0;
+        //wlr_scene_node_reparent(&c->scene->node, layers[LyrFS]);
+    } else if (!fullscreen && c->isfullscreen) {
+        c->bw = c->oldbw;
+        //wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
+    } else {
+        return;
+    }
+    c->isfullscreen = fullscreen;
+    client_set_fullscreen(c, fullscreen);
 }
 
 void

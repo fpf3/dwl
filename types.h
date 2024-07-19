@@ -60,6 +60,7 @@ typedef struct {
 	struct wl_listener set_hints;
 #endif
 	unsigned int bw;
+    unsigned int oldbw;
 	uint32_t tags;
 	int isfloating, isurgent, isfullscreen;
 	uint32_t resize; /* configure serial of a pending resize */
@@ -129,11 +130,11 @@ struct Monitor {
 	struct wlr_box w; /* window area, layout-relative */
 	struct wl_list layers[4]; /* LayerSurface.link */
 	const Layout *lt[2];
+    Layout* last_lt;
     Pertag *pertag;
 	int gaps;
 	unsigned int seltags;
 	unsigned int sellt;
-    unsigned int last_sellt;
 	uint32_t tagset[2];
     uint32_t last_tags;
 	float mfact;
